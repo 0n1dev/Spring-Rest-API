@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,9 +37,9 @@ public class EventControllerTest {
 
     @Test
     public void createEvent() throws Exception {
-        Event event = Event.builder()
+        EventDto eventDto = EventDto.builder()
                 .name("Spring")
-                .description("REST API Test")
+                .description("Spring Test")
                 .beginEnrollmentDateTime(LocalDateTime.of(2021, 5, 5, 10, 0))
                 .closeEnrollmentDateTime(LocalDateTime.of(2021, 5, 7, 10, 0))
                 .beginEventDateTime(LocalDateTime.of(2021, 5, 12, 10, 0))
@@ -50,11 +52,14 @@ public class EventControllerTest {
 
         mockMvc.perform(post("/api/events/")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaTypes.HAL_JSON)
-                    .content(objectMapper.writeValueAsString(event)))
+                    .accept(new MediaType("application", "hal+json", StandardCharsets.UTF_8)) // 한글이 자꾸 깨짐
+                    .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE));
+                .andExpect(content().contentType(new MediaType("application", "hal+json", StandardCharsets.UTF_8)))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-event").exists());
     }
 
     @Test

@@ -15,3 +15,13 @@
     - REL (리소스와의 관계)
         - self
         - profile
+        
+ ---
+ 
+ HATEOAS 버전이 바뀌면서 변경된것
+ 
+ - `ResourceSupport` changed to `RepresentationModel`
+ - `Resource` changed to `EntityModel`
+ - `Resources` changed to `CollectionModel`
+ - `PagedResources` changed to `PagedModel`
+ - `ResourceAssembler` changed to `RepresentationModelAssembler`
